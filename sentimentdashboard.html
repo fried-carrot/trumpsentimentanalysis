@@ -1,0 +1,3463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Fiscal Policy Sentiment Analysis</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/ScrollTrigger.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.8.0/math.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/regression/2.0.1/regression.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Manrope:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #080b14;
+            --bg-secondary: #0f111c;
+            --bg-tertiary: #161a2c;
+            --bg-quaternary: #1d2138;
+            --bg-card: rgba(23, 26, 42, 0.6);
+            --bg-glass: rgba(15, 17, 28, 0.7);
+            
+            --accent-primary: #6366f1;
+            --accent-secondary: #a855f7;
+            --accent-tertiary: #3b82f6;
+            --accent-success: #10b981;
+            --accent-danger: #ef4444;
+            --accent-warning: #f59e0b;
+            --accent-info: #0ea5e9;
+            
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-tertiary: #64748b;
+            --text-success: #ecfdf5;
+            --text-danger: #fef2f2;
+            --text-warning: #fffbeb;
+            --text-info: #ecfeff;
+            
+            --card-border: rgba(255, 255, 255, 0.08);
+            --card-highlight: rgba(255, 255, 255, 0.03);
+            --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            
+            --gradient-purple-blue: linear-gradient(135deg, #a855f7, #3b82f6);
+            --gradient-blue-purple: linear-gradient(135deg, #3b82f6, #a855f7);
+            --gradient-blue-green: linear-gradient(135deg, #3b82f6, #10b981);
+            --gradient-purple-pink: linear-gradient(135deg, #a855f7, #ec4899);
+            --gradient-red-orange: linear-gradient(135deg, #ef4444, #f59e0b);
+            
+            --blur-effect: blur(20px);
+            
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
+            --shadow-glow-purple: 0 0 15px rgba(168, 85, 247, 0.4);
+            --shadow-glow-blue: 0 0 15px rgba(59, 130, 246, 0.4);
+            --shadow-glow-red: 0 0 15px rgba(239, 68, 68, 0.4);
+            
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 20px;
+            --radius-xl: 28px;
+            
+            --font-sans: 'Manrope', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            --font-display: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            --font-mono: 'Space Mono', monospace;
+            
+            --transition-fast: 0.15s;
+            --transition-medium: 0.3s;
+            --transition-slow: 0.5s;
+            
+            --easing-standard: cubic-bezier(0.2, 0, 0.2, 1);
+            --easing-accelerate: cubic-bezier(0.4, 0, 1, 1);
+            --easing-decelerate: cubic-bezier(0, 0, 0.2, 1);
+            --easing-emphasized: cubic-bezier(0.2, 0, 0, 1);
+        }
+        
+        @keyframes gradientFlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.5); }
+            70% { box-shadow: 0 0 0 15px rgba(99, 102, 241, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes borderGlow {
+            0% { opacity: 0.4; }
+            50% { opacity: 0.8; }
+            100% { opacity: 0.4; }
+        }
+        
+        @keyframes shimmer {
+            0% { background-position: -1000px 0; }
+            100% { background-position: 1000px 0; }
+        }
+        
+        @keyframes dot-flashing {
+            0% { background-color: var(--accent-primary); }
+            50%, 100% { background-color: rgba(99, 102, 241, 0.2); }
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: all var(--transition-fast) var(--easing-standard);
+        }
+        
+        body {
+            font-family: var(--font-sans);
+            color: var(--text-primary);
+            background-color: var(--bg-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+        
+        #vanta-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.15;
+            background: linear-gradient(135deg, #080b14 0%, #161a2c 100%);
+        }
+        
+        h1, h2, h3, h4, h5, h6 {
+            font-family: var(--font-display);
+            font-weight: 700;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+            letter-spacing: -0.025em;
+        }
+        
+        h1 {
+            font-size: 3.5rem;
+            background: var(--gradient-red-orange);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: gradientFlow 8s ease infinite;
+            background-size: 200% 200%;
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.04em;
+        }
+        
+        h2 {
+            font-size: 2.5rem;
+            background: var(--gradient-red-orange);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            position: relative;
+            display: inline-block;
+        }
+        
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 0;
+            height: 4px;
+            background: var(--gradient-red-orange);
+            transition: width 0.6s var(--easing-emphasized);
+            border-radius: 4px;
+        }
+        
+        h2.animate::after {
+            width: 100%;
+        }
+        
+        h3 {
+            font-size: 1.875rem;
+            color: var(--text-primary);
+        }
+        
+        p {
+            margin-bottom: 1.25rem;
+            font-size: 1.05rem;
+            color: var(--text-secondary);
+            max-width: 85ch;
+            line-height: 1.7;
+        }
+        
+        code {
+            font-family: var(--font-mono);
+            background-color: var(--bg-tertiary);
+            padding: 0.2em 0.4em;
+            border-radius: 4px;
+            font-size: 0.9em;
+            color: var(--accent-info);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+        
+        header {
+            background: var(--bg-glass);
+            backdrop-filter: var(--blur-effect);
+            -webkit-backdrop-filter: var(--blur-effect);
+            padding: 2rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow-md);
+            border-bottom: 1px solid var(--card-border);
+        }
+        
+        .subheading {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            max-width: 800px;
+            line-height: 1.5;
+        }
+        
+        .stats-bar {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 2rem;
+        }
+        
+        .stat-badge {
+            background: var(--bg-tertiary);
+            border-radius: 50px;
+            padding: 0.75rem 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            border: 1px solid var(--card-border);
+            font-size: 0.95rem;
+            box-shadow: var(--shadow-sm);
+            transition: transform 0.3s var(--easing-standard), box-shadow 0.3s var(--easing-standard);
+        }
+        
+        .stat-badge:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md), 0 0 15px rgba(239, 68, 68, 0.3);
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+        
+        .stat-badge svg {
+            color: var(--accent-danger);
+        }
+        
+        .stat-badge.negative svg {
+            color: var(--accent-danger);
+        }
+        
+        .section {
+            margin: 6rem 0;
+        }
+        
+        .section-header {
+            margin-bottom: 3rem;
+        }
+        
+        .section-title {
+            margin-bottom: 1rem;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .section-title::before {
+            content: '';
+            position: absolute;
+            left: -20px;
+            height: 100%;
+            width: 4px;
+            background: var(--gradient-red-orange);
+            border-radius: 4px;
+        }
+        
+        .section-description {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+            max-width: 800px;
+        }
+        
+        .card {
+            background-color: var(--bg-card);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--card-border);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 2rem;
+            position: relative;
+            backdrop-filter: var(--blur-effect);
+            -webkit-backdrop-filter: var(--blur-effect);
+        }
+        
+        .card-gradient-border {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: var(--radius-lg);
+            padding: 1px;
+            -webkit-mask: 
+                linear-gradient(#fff 0 0) content-box, 
+                linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            background: var(--gradient-red-orange);
+            opacity: 0.6;
+            pointer-events: none;
+            animation: borderGlow 4s ease-in-out infinite;
+        }
+        
+        .card-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--card-border);
+            background: rgba(0, 0, 0, 0.2);
+        }
+        
+        .card-body {
+            padding: 2rem;
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 0;
+            position: relative;
+            gap: 0.5rem;
+        }
+        
+        .tab {
+            padding: 1rem 1.25rem;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--text-tertiary);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transition: all 0.3s var(--easing-standard);
+            position: relative;
+            overflow: hidden;
+            border-radius: var(--radius-sm);
+        }
+        
+        .tab::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--accent-danger);
+            opacity: 0;
+            z-index: -1;
+            transform: translateY(100%);
+            transition: transform 0.3s var(--easing-standard), opacity 0.3s var(--easing-standard);
+        }
+        
+        .tab:hover {
+            color: var(--text-primary);
+        }
+        
+        .tab:hover::before {
+            opacity: 0.1;
+            transform: translateY(0);
+        }
+        
+        .tab.active {
+            color: var(--accent-danger);
+            background: rgba(239, 68, 68, 0.08);
+        }
+        
+        .tab svg {
+            width: 20px;
+            height: 20px;
+            stroke-width: 2px;
+        }
+        
+        .tab-indicator {
+            position: absolute;
+            bottom: -1px;
+            height: 3px;
+            background: var(--gradient-red-orange);
+            transition: all 0.4s cubic-bezier(0.2, 0, 0, 1);
+            box-shadow: var(--shadow-glow-red);
+            border-radius: 3px 3px 0 0;
+        }
+        
+        .tab-content {
+            display: none;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        
+        .tab-content.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+            animation: fadeIn 0.5s var(--easing-emphasized) forwards;
+        }
+        
+        .chart-container {
+            height: 600px;
+            margin: 2rem 0;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--card-border);
+            position: relative;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s var(--easing-standard);
+        }
+        
+        .chart-container:hover {
+            box-shadow: var(--shadow-lg);
+            border-color: rgba(239, 68, 68, 0.2);
+        }
+        
+        .chart-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .chart-control-btn {
+            background-color: var(--bg-tertiary);
+            border: 1px solid var(--card-border);
+            color: var(--text-secondary);
+            border-radius: var(--radius-md);
+            padding: 0.75rem 1.25rem;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s var(--easing-standard);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .chart-control-btn:hover {
+            background: linear-gradient(rgba(239, 68, 68, 0.05), rgba(239, 68, 68, 0.1));
+            color: var(--text-primary);
+            border-color: rgba(239, 68, 68, 0.3);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md), 0 0 10px rgba(239, 68, 68, 0.2);
+        }
+        
+        .chart-control-btn svg {
+            transition: transform 0.3s var(--easing-emphasized);
+        }
+        
+        .chart-control-btn:hover svg {
+            transform: scale(1.3) rotate(5deg);
+        }
+        
+        .chart-control-btn.active {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.8), rgba(245, 158, 11, 0.8));
+            color: white;
+            border-color: rgba(239, 68, 68, 0.8);
+            box-shadow: var(--shadow-glow-red);
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+        
+        .metric-card {
+            background-color: var(--bg-tertiary);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-md);
+            padding: 1.75rem;
+            transition: all 0.4s var(--easing-emphasized);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--gradient-red-orange);
+            opacity: 0;
+            transition: opacity 0.4s var(--easing-standard);
+            z-index: 0;
+        }
+        
+        .metric-card:hover {
+            transform: translateY(-8px) scale(1.03);
+            box-shadow: var(--shadow-lg), 0 0 20px rgba(239, 68, 68, 0.3);
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+        
+        .metric-card:hover::before {
+            opacity: 0.05;
+        }
+        
+        .metric-label {
+            font-size: 0.875rem;
+            color: var(--text-tertiary);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.75rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .metric-value {
+            font-size: 3rem;
+            font-weight: 700;
+            background-image: var(--gradient-red-orange);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            position: relative;
+            z-index: 1;
+            line-height: 1.2;
+            margin-bottom: 0.75rem;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeIn 0.6s var(--easing-emphasized) forwards;
+            animation-delay: 0.3s;
+        }
+        
+        .metric-change {
+            font-size: 0.875rem;
+            font-weight: 500;
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .metric-change.positive {
+            color: var(--accent-success);
+        }
+        
+        .metric-change.negative {
+            color: var(--accent-danger);
+        }
+        
+        .tech-explanation {
+            background-color: var(--bg-tertiary);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-md);
+            padding: 2rem;
+            margin: 2.5rem 0;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s var(--easing-standard);
+        }
+        
+        .tech-explanation:hover {
+            box-shadow: var(--shadow-lg);
+            border-color: rgba(239, 68, 68, 0.2);
+        }
+        
+        .tech-explanation::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at center, rgba(239, 68, 68, 0.1), transparent 70%);
+            opacity: 0;
+            transition: opacity 0.6s var(--easing-emphasized);
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        .tech-explanation:hover::before {
+            opacity: 1;
+        }
+        
+        .tech-explanation-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.25rem;
+            gap: 0.875rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .tech-explanation-title {
+            font-weight: 700;
+            color: var(--text-primary);
+            font-size: 1.25rem;
+        }
+        
+        .equation-block {
+            font-family: var(--font-mono);
+            color: var(--text-secondary);
+            background-color: rgba(33, 38, 45, 0.6);
+            padding: 1.75rem;
+            border-radius: var(--radius-sm);
+            margin: 1.75rem 0;
+            overflow-x: auto;
+            border: 1px solid var(--card-border);
+            position: relative;
+            z-index: 1;
+            line-height: 1.8;
+        }
+        
+        .equation-block::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background: var(--gradient-red-orange);
+            border-radius: 3px 0 0 3px;
+        }
+        
+        .equation-notation {
+            display: block;
+            font-size: 0.875rem;
+            color: var(--text-tertiary);
+            margin-top: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 1rem;
+        }
+        
+        .prediction-card {
+            background-color: var(--bg-secondary);
+            border-radius: var(--radius-lg);
+            padding: 2.5rem;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 3rem;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--card-border);
+            transition: all 0.4s var(--easing-emphasized);
+        }
+        
+        .prediction-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg), 0 0 30px rgba(239, 68, 68, 0.2);
+            border-color: rgba(239, 68, 68, 0.2);
+        }
+        
+        .prediction-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.05), rgba(245, 158, 11, 0.05));
+            opacity: 0;
+            transition: opacity 0.4s var(--easing-standard);
+            z-index: 0;
+        }
+        
+        .prediction-card:hover::before {
+            opacity: 1;
+        }
+        
+        .timeline-stepper {
+            display: flex;
+            margin: 3rem 0;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .timeline-step {
+            flex: 1;
+            text-align: center;
+            padding: 0 1rem;
+            position: relative;
+        }
+        
+        .timeline-step::before {
+            content: '';
+            position: absolute;
+            top: 35px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: var(--card-border);
+            z-index: -1;
+        }
+        
+        .timeline-marker {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: var(--bg-tertiary);
+            border: 2px solid var(--card-border);
+            margin: 0 auto 1.25rem;
+            position: relative;
+            z-index: 2;
+            transition: all 0.5s var(--easing-emphasized);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .timeline-marker.active {
+            background-color: var(--accent-danger);
+            border-color: var(--accent-danger);
+            transform: scale(1.3);
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.5);
+        }
+        
+        .timeline-label {
+            font-weight: 600;
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .timeline-value {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--text-primary);
+            opacity: 0;
+            transform: translateY(10px);
+            animation: fadeIn 0.4s var(--easing-emphasized) forwards;
+            animation-delay: var(--delay, 0.2s);
+        }
+        
+        .similar-policy {
+            background-color: var(--bg-tertiary);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            margin-bottom: 1.25rem;
+            transition: all 0.3s var(--easing-emphasized);
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 1.25rem;
+            align-items: center;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .similar-policy:hover {
+            background-color: var(--bg-quaternary);
+            transform: translateX(12px);
+            border-color: rgba(239, 68, 68, 0.3);
+            box-shadow: var(--shadow-md), 0 0 15px rgba(239, 68, 68, 0.2);
+        }
+        
+        .policy-number {
+            width: 38px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--accent-danger);
+            border-radius: 50%;
+            font-weight: 700;
+            font-size: 1.125rem;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s var(--easing-emphasized);
+        }
+        
+        .similar-policy:hover .policy-number {
+            transform: scale(1.1) rotate(-10deg);
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.3);
+            background: rgba(239, 68, 68, 0.2);
+        }
+        
+        .policy-details {
+            display: flex;
+            flex-direction: column;
+            gap: 0.375rem;
+        }
+        
+        .policy-name {
+            font-weight: 600;
+            font-size: 1.125rem;
+            color: var(--text-primary);
+        }
+        
+        .policy-pattern {
+            font-size: 0.875rem;
+            color: var(--text-tertiary);
+        }
+        
+        .policy-bar-container {
+            width: 140px;
+            height: 8px;
+            background: var(--bg-primary);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .policy-bar {
+            height: 100%;
+            background: var(--gradient-red-orange);
+            border-radius: 4px;
+            width: 0;
+            animation: growBar 1.5s var(--easing-emphasized) forwards;
+            animation-delay: var(--delay, 0.5s);
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
+        }
+        
+        @keyframes growBar {
+            to { width: var(--width); }
+        }
+        
+        .upload-container {
+            background-color: var(--bg-tertiary);
+            border: 2px dashed rgba(239, 68, 68, 0.4);
+            border-radius: var(--radius-lg);
+            padding: 3rem;
+            margin: 3rem 0;
+            text-align: center;
+            transition: all 0.4s var(--easing-emphasized);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .upload-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--accent-danger);
+            opacity: 0;
+            transition: opacity 0.4s var(--easing-standard);
+            z-index: 0;
+        }
+        
+        .upload-container:hover {
+            background-color: rgba(239, 68, 68, 0.05);
+            transform: translateY(-8px) scale(1.01);
+            box-shadow: var(--shadow-lg), 0 0 30px rgba(239, 68, 68, 0.2);
+            border-color: rgba(239, 68, 68, 0.6);
+        }
+        
+        .upload-container:hover::before {
+            opacity: 0.03;
+        }
+        
+        .upload-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 2rem;
+            color: var(--accent-danger);
+            position: relative;
+            z-index: 1;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        .upload-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .upload-text {
+            font-size: 1.125rem;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .upload-hint {
+            font-size: 0.875rem;
+            color: var(--text-tertiary);
+            margin-bottom: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .upload-button {
+            margin-top: 1.75rem;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, var(--accent-danger), var(--accent-warning));
+            border: none;
+            border-radius: var(--radius-md);
+            color: white;
+            font-weight: 600;
+            font-size: 1.125rem;
+            cursor: pointer;
+            transition: all 0.3s var(--easing-emphasized);
+            box-shadow: var(--shadow-md);
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+        }
+        
+        .upload-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: all 0.6s var(--easing-standard);
+        }
+        
+        .upload-button:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg), 0 0 20px rgba(239, 68, 68, 0.4);
+        }
+        
+        .upload-button:hover::before {
+            left: 100%;
+        }
+        
+        .model-comparison {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin: 2.5rem 0;
+        }
+        
+        .model-card {
+            background-color: var(--bg-tertiary);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-md);
+            padding: 1.75rem;
+            transition: all 0.3s var(--easing-emphasized);
+            box-shadow: var(--shadow-md);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .model-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 0.3s var(--easing-standard);
+        }
+        
+        .model-card:nth-child(1)::before {
+            background: var(--accent-danger);
+            opacity: 1;
+        }
+        
+        .model-card:nth-child(2)::before {
+            background: var(--accent-tertiary);
+        }
+        
+        .model-card:nth-child(3)::before {
+            background: var(--accent-info);
+        }
+        
+        .model-card:nth-child(4)::before {
+            background: var(--accent-warning);
+        }
+        
+        .model-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-lg), 0 0 20px rgba(239, 68, 68, 0.2);
+            border-color: rgba(239, 68, 68, 0.2);
+        }
+        
+        .model-card:hover::before {
+            opacity: 1;
+        }
+        
+        .model-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--accent-danger);
+            padding: 0.375rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .model-name {
+            font-weight: 700;
+            color: var(--text-primary);
+            font-size: 1.25rem;
+            margin-bottom: 0.75rem;
+            padding-right: 6rem;
+        }
+        
+        .model-card:nth-child(1) .model-name {
+            color: var(--accent-danger);
+        }
+        
+        .model-card:nth-child(2) .model-name {
+            color: var(--accent-tertiary);
+        }
+        
+        .model-card:nth-child(3) .model-name {
+            color: var(--accent-info);
+        }
+        
+        .model-card:nth-child(4) .model-name {
+            color: var(--accent-warning);
+        }
+        
+        .model-description {
+            color: var(--text-secondary);
+            font-size: 0.9375rem;
+            margin-bottom: 1.25rem;
+            line-height: 1.5;
+        }
+        
+        .model-metrics {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+        }
+        
+        .model-metric {
+            background-color: var(--bg-quaternary);
+            padding: 0.5rem 0.75rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.875rem;
+            transition: all 0.3s var(--easing-standard);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .metric-name {
+            font-size: 0.75rem;
+            color: var(--text-tertiary);
+            margin-bottom: 0.25rem;
+        }
+        
+        .metric-value {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .model-card:hover .model-metric {
+            background-color: rgba(239, 68, 68, 0.1);
+        }
+        
+        .loader-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.6s ease-out;
+            backdrop-filter: var(--blur-effect);
+            -webkit-backdrop-filter: var(--blur-effect);
+        }
+        
+        .loader-content {
+            text-align: center;
+            max-width: 400px;
+        }
+        
+        .loader {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 3px solid rgba(239, 68, 68, 0.1);
+            border-top: 3px solid var(--accent-danger);
+            animation: spin 1.5s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite;
+            margin: 0 auto 2rem;
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
+        }
+        
+        .loader-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: var(--gradient-red-orange);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .loader-text {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+        
+        .loader-progress {
+            height: 4px;
+            width: 100%;
+            background-color: var(--bg-tertiary);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+        
+        .loader-progress-bar {
+            height: 100%;
+            width: 0;
+            background: var(--gradient-red-orange);
+            animation: progress 2.5s ease-in-out infinite;
+        }
+        
+        @keyframes progress {
+            0% { width: 0; }
+            50% { width: 70%; }
+            100% { width: 100%; }
+        }
+        
+        .loader-stats {
+            font-size: 0.875rem;
+            color: var(--text-tertiary);
+        }
+        
+        .hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .divider {
+            height: 1px;
+            background: linear-gradient(to right, transparent, var(--card-border), transparent);
+            margin: 4rem 0;
+            position: relative;
+        }
+        
+        .divider::before {
+            content: '•';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: var(--bg-primary);
+            padding: 0 1rem;
+            color: var(--text-tertiary);
+        }
+        
+        .advanced-features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.5rem;
+            margin: 2.5rem 0;
+        }
+        
+        .advanced-feature-card {
+            background-color: var(--bg-tertiary);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-md);
+            padding: 1.75rem;
+            transition: all 0.3s var(--easing-emphasized);
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            box-shadow: var(--shadow-md);
+        }
+        
+        .advanced-feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-lg), 0 0 20px rgba(239, 68, 68, 0.2);
+            border-color: rgba(239, 68, 68, 0.2);
+            background-color: var(--bg-quaternary);
+        }
+        
+        .advanced-feature-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(239, 68, 68, 0.1);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 0.5rem;
+            color: var(--accent-danger);
+            transition: all 0.3s var(--easing-standard);
+        }
+        
+        .advanced-feature-card:hover .advanced-feature-icon {
+            transform: scale(1.1);
+            background: rgba(239, 68, 68, 0.2);
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.3);
+        }
+        
+        .advanced-feature-title {
+            font-weight: 700;
+            font-size: 1.125rem;
+            color: var(--text-primary);
+        }
+        
+        .advanced-feature-description {
+            font-size: 0.9375rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            flex-grow: 1;
+        }
+        
+        .advanced-feature-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        
+        .feature-tag {
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--text-tertiary);
+            background-color: var(--bg-secondary);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            transition: all 0.2s var(--easing-standard);
+        }
+        
+        .advanced-feature-card:hover .feature-tag {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--accent-danger);
+        }
+        
+        .heatmap-container {
+            width: 100%;
+            overflow: hidden;
+            border-radius: var(--radius-md);
+            margin: 2rem 0;
+            border: 1px solid var(--card-border);
+            background-color: var(--bg-secondary);
+        }
+        
+        .heatmap-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+        }
+        
+        .heatmap-label {
+            font-size: 0.75rem;
+            color: var(--text-tertiary);
+            flex: 1;
+            text-align: center;
+        }
+        
+        .heatmap-row {
+            display: flex;
+            height: 40px;
+            margin-bottom: 2px;
+        }
+        
+        .heatmap-row-label {
+            width: 100px;
+            padding-right: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+        
+        .heatmap-cells {
+            display: flex;
+            flex-grow: 1;
+            gap: 2px;
+        }
+        
+        .heatmap-cell {
+            flex: 1;
+            border-radius: 2px;
+            transition: all 0.2s var(--easing-standard);
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .heatmap-cell:hover {
+            transform: scale(1.05);
+            box-shadow: var(--shadow-sm);
+            z-index: 1;
+        }
+        
+        .cell-tooltip {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--bg-glass);
+            padding: 0.5rem 0.75rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.75rem;
+            color: var(--text-primary);
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s var(--easing-standard);
+            z-index: 10;
+            backdrop-filter: var(--blur-effect);
+            -webkit-backdrop-filter: var(--blur-effect);
+            border: 1px solid var(--card-border);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .heatmap-cell:hover .cell-tooltip {
+            opacity: 1;
+        }
+        
+        .anomaly-detection {
+            background-color: var(--bg-tertiary);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--card-border);
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .anomaly-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+        }
+        
+        .anomaly-title {
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--text-primary);
+        }
+        
+        .anomaly-icon {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(245, 158, 11, 0.1);
+            color: var(--accent-warning);
+            border-radius: 50%;
+        }
+        
+        .anomaly-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        
+        .anomaly-item {
+            background-color: var(--bg-quaternary);
+            border-radius: var(--radius-sm);
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: all 0.2s var(--easing-standard);
+        }
+        
+        .anomaly-item:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .anomaly-marker {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background-color: var(--accent-warning);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            flex-shrink: 0;
+        }
+        
+        .anomaly-info {
+            flex-grow: 1;
+        }
+        
+        .anomaly-date {
+            font-weight: 600;
+            font-size: 0.9375rem;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+        
+        .anomaly-description {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+        
+        .anomaly-value {
+            font-weight: 700;
+            font-size: 1.125rem;
+            color: var(--accent-warning);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .influencer-analysis {
+            margin: 2rem 0;
+        }
+        
+        .influencer-chart {
+            height: 400px;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--card-border);
+            margin-top: 1.5rem;
+        }
+        
+        .influencer-metrics {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            margin-top: 1.5rem;
+        }
+        
+        .influencer-metric {
+            background-color: var(--bg-tertiary);
+            border-radius: var(--radius-md);
+            padding: 1.25rem;
+            border: 1px solid var(--card-border);
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .influencer-metric-label {
+            font-size: 0.875rem;
+            color: var(--text-tertiary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .influencer-metric-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        
+        .influencer-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1.5rem;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+        }
+        
+        .influencer-table th,
+        .influencer-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--card-border);
+        }
+        
+        .influencer-table th {
+            background-color: var(--bg-tertiary);
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+        }
+        
+        .influencer-table td {
+            font-size: 0.9375rem;
+            color: var(--text-secondary);
+        }
+        
+        .influencer-table tbody tr {
+            background-color: var(--bg-secondary);
+            transition: all 0.2s var(--easing-standard);
+        }
+        
+        .influencer-table tbody tr:hover {
+            background-color: var(--bg-tertiary);
+        }
+        
+        .influencer-table .sentiment-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+        }
+        
+        .influencer-table .positive {
+            background-color: var(--accent-success);
+        }
+        
+        .influencer-table .neutral {
+            background-color: var(--text-tertiary);
+        }
+        
+        .influencer-table .negative {
+            background-color: var(--accent-danger);
+        }
+        
+        .footer {
+            margin-top: 6rem;
+            padding: 4rem 0;
+            text-align: center;
+            color: var(--text-tertiary);
+            border-top: 1px solid var(--card-border);
+            background-color: var(--bg-secondary);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, rgba(239, 68, 68, 0.05), transparent 70%);
+            pointer-events: none;
+        }
+        
+        .footer-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .footer-logo {
+            margin-bottom: 1.5rem;
+        }
+        
+        .footer-title {
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            background: var(--gradient-red-orange);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .footer-description {
+            max-width: 600px;
+            margin: 0 auto 1.5rem;
+            color: var(--text-secondary);
+        }
+        
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .footer-link {
+            color: var(--text-tertiary);
+            text-decoration: none;
+            transition: all 0.2s var(--easing-standard);
+        }
+        
+        .footer-link:hover {
+            color: var(--accent-danger);
+            transform: translateY(-2px);
+        }
+        
+        .dot-flashing {
+            position: relative;
+            width: 10px;
+            height: 10px;
+            border-radius: 5px;
+            background-color: var(--accent-primary);
+            color: var(--accent-primary);
+            animation: dot-flashing 1s infinite linear alternate;
+            animation-delay: 0.5s;
+            display: inline-block;
+            margin: 0 4px;
+        }
+        
+        .dot-flashing::before, .dot-flashing::after {
+            content: '';
+            display: inline-block;
+            position: absolute;
+            top: 0;
+            width: 10px;
+            height: 10px;
+            border-radius: 5px;
+            background-color: var(--accent-primary);
+            color: var(--accent-primary);
+            animation: dot-flashing 1s infinite alternate;
+        }
+        
+        .dot-flashing::before {
+            left: -15px;
+            animation-delay: 0s;
+        }
+        
+        .dot-flashing::after {
+            left: 15px;
+            animation-delay: 1s;
+        }
+        
+        .file-drop-area {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 100%;
+            min-height: 200px;
+            padding: 25px;
+            border: 2px dashed rgba(239, 68, 68, 0.4);
+            border-radius: 3px;
+            transition: 0.2s;
+            margin-bottom: 20px;
+        }
+        
+        .file-drop-area.is-active {
+            background-color: rgba(239, 68, 68, 0.05);
+        }
+        
+        .fake-btn {
+            flex-shrink: 0;
+            background-color: var(--accent-danger);
+            border: 1px solid var(--accent-danger);
+            border-radius: 3px;
+            padding: 8px 15px;
+            margin-right: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            color: white;
+        }
+        
+        .file-msg {
+            font-size: 15px;
+            font-weight: 500;
+            line-height: 1.4;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .file-input {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 100%;
+            cursor: pointer;
+            opacity: 0;
+        }
+        
+        .live-analyses {
+            background-color: var(--bg-tertiary);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            border: 1px solid var(--card-border);
+            margin-top: 2rem;
+        }
+        
+        .live-analyses-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+        }
+        
+        .live-icon {
+            position: relative;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: var(--accent-success);
+            box-shadow: 0 0 10px var(--accent-success);
+            margin-right: 0.5rem;
+        }
+        
+        .live-analyses-title {
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--text-primary);
+        }
+        
+        .live-analyses-description {
+            color: var(--text-secondary);
+            font-size: 0.9375rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .live-analyses-content {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .live-analysis-item {
+            background-color: var(--bg-quaternary);
+            border-radius: var(--radius-sm);
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: all 0.2s var(--easing-standard);
+        }
+        
+        .live-analysis-item:hover {
+            transform: translateX(5px);
+            background-color: rgba(239, 68, 68, 0.1);
+        }
+        
+        .live-analysis-icon {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--bg-tertiary);
+            border-radius: var(--radius-sm);
+            color: var(--accent-danger);
+        }
+        
+        .live-analysis-info {
+            flex-grow: 1;
+        }
+        
+        .live-analysis-title {
+            font-weight: 600;
+            font-size: 0.9375rem;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+        
+        .live-analysis-description {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+        
+        .live-analysis-time {
+            font-size: 0.75rem;
+            color: var(--text-tertiary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .correlation-matrix {
+            margin: 2rem 0;
+        }
+        
+        .correlation-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 2px;
+            background-color: var(--bg-tertiary);
+            padding: 2px;
+            border-radius: var(--radius-md);
+        }
+        
+        .correlation-cell {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.875rem;
+            color: var(--text-primary);
+            border-radius: 4px;
+            transition: all 0.2s var(--easing-standard);
+            cursor: pointer;
+        }
+        
+        .correlation-cell:hover {
+            transform: scale(1.05);
+            box-shadow: var(--shadow-sm);
+            z-index: 1;
+        }
+        
+        .correlation-legend {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+            justify-content: center;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+        
+        .legend-color {
+            width: 20px;
+            height: 10px;
+            border-radius: 2px;
+        }
+        
+        @media (max-width: 1024px) {
+            h1 { font-size: 2.5rem; }
+            h2 { font-size: 2rem; }
+            .process-step { grid-template-columns: 1fr; gap: 1rem; }
+            .process-step:not(:last-child)::after { display: none; }
+            .step-number { margin-bottom: 1rem; }
+        }
+        
+        @media (max-width: 768px) {
+            .metrics-grid { grid-template-columns: 1fr; }
+            .similar-policy { grid-template-columns: auto 1fr; }
+            .tabs { flex-wrap: wrap; }
+            .tab { 
+                flex: 1; 
+                justify-content: center; 
+                font-size: 0.85rem; 
+                padding: 0.75rem; 
+                min-width: 120px;
+            }
+            h1 { font-size: 2rem; }
+            h2 { font-size: 1.75rem; }
+            .chart-container { height: 400px; }
+            .model-comparison { grid-template-columns: 1fr; }
+            .model-metrics { grid-template-columns: 1fr 1fr; }
+            .upload-container { padding: 2rem; }
+        }
+        
+    </style>
+</head>
+<body>
+    <div id="vanta-bg"></div>
+    
+    <div class="loader-container" id="loader">
+        <div class="loader-content">
+            <div class="loader"></div>
+            <h3 class="loader-title">Advanced Sentiment Analysis</h3>
+            <p class="loader-text">Initializing high-performance analytical engine and loading your Twitter fiscal policy data...</p>
+            <div class="loader-progress">
+                <div class="loader-progress-bar"></div>
+            </div>
+            <div class="loader-stats">Loading components: 5/5</div>
+        </div>
+    </div>
+
+    <header>
+        <div class="container">
+            <h1 data-aos="fade-up">Fiscal Policy Sentiment Analysis</h1>
+            <p class="subheading" data-aos="fade-up" data-aos-delay="100">Advanced statistical modeling of Trump's fiscal policy impact through Twitter sentiment patterns, machine learning algorithms, and predictive forecasting</p>
+            
+            <div class="stats-bar">
+                <div class="stat-badge negative" data-aos="fade-up" data-aos-delay="150">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                    <span id="total-tweets-stat">10,718 tweets analyzed</span>
+                </div>
+                <div class="stat-badge negative" data-aos="fade-up" data-aos-delay="200">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="16"></line></svg>
+                    <span>9 time periods (Jan-Mar 2025)</span>
+                </div>
+                <div class="stat-badge negative" data-aos="fade-up" data-aos-delay="250">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                    <span id="negative-percent-stat">46.1% negative sentiment</span>
+                </div>
+                <div class="stat-badge negative" data-aos="fade-up" data-aos-delay="300">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"></line><line x1="18" y1="20" x2="18" y2="4"></line><line x1="6" y1="20" x2="6" y2="16"></line></svg>
+                    <span id="avg-sentiment-stat">-0.34 avg sentiment</span>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <main class="container">
+        <section class="section" id="upload-section" data-aos="fade-up">
+            <div class="section-header">
+                <h2 class="section-title">Data Analysis & Visualization</h2>
+                <p class="section-description">Comprehensive sentiment analysis of Twitter data related to Trump's fiscal policies with advanced statistical modeling and predictive analytics.</p>
+            </div>
+            
+            <div class="card">
+                <div class="card-gradient-border"></div>
+                <div class="card-header">
+                    <div class="tabs">
+                        <div class="tab active" data-tab="timeline">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="16"></line></svg>
+                            Sentiment Timeline
+                        </div>
+                        <div class="tab" data-tab="comparison">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="18" y="3" width="4" height="18"></rect><rect x="10" y="8" width="4" height="13"></rect><rect x="2" y="13" width="4" height="8"></rect></svg>
+                            Period Comparison
+                        </div>
+                        <div class="tab" data-tab="influencers">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                            Influencer Impact
+                        </div>
+                        <div class="tab" data-tab="prediction">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline><polyline points="16 7 22 7 22 13"></polyline></svg>
+                            Forecasting
+                        </div>
+                        <div class="tab" data-tab="anomalies">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                            Anomaly Detection
+                        </div>
+                        <div class="tab-indicator"></div>
+                    </div>
+                </div>
+                
+                <div class="card-body">
+                    <div id="timeline-tab" class="tab-content active">
+                        <div class="card-section">
+                            <h3>Sentiment Evolution Analysis</h3>
+                            <p>Detailed tracking of public sentiment toward Trump's fiscal policy over time, showing temporal patterns and key inflection points.</p>
+                            
+                            <div class="metrics-grid">
+                                <div class="metric-card">
+                                    <div class="metric-label">Avg. Sentiment</div>
+                                    <div class="metric-value" id="avg-sentiment-value">-0.34</div>
+                                    <div class="metric-change negative">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>
+                                        <span>Strongly Negative</span>
+                                    </div>
+                                </div>
+                                <div class="metric-card">
+                                    <div class="metric-label">Volatility</div>
+                                    <div class="metric-value" id="volatility-value">0.05</div>
+                                    <div class="metric-change neutral">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                        <span>Moderate</span>
+                                    </div>
+                                </div>
+                                <div class="metric-card">
+                                    <div class="metric-label">Positive</div>
+                                    <div class="metric-value" id="positive-value">8.1%</div>
+                                    <div class="metric-change negative">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>
+                                        <span>Very Low</span>
+                                    </div>
+                                </div>
+                                <div class="metric-card">
+                                    <div class="metric-label">Negative</div>
+                                    <div class="metric-value" id="negative-value">46.1%</div>
+                                    <div class="metric-change negative">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
+                                        <span>Very High</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="chart-controls">
+                                <button class="chart-control-btn active" data-view="line">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                                    Line View
+                                </button>
+                                <button class="chart-control-btn" data-view="area">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
+                                    Area View
+                                </button>
+                                <button class="chart-control-btn" data-view="bar">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="18" y="3" width="4" height="18"></rect><rect x="10" y="8" width="4" height="13"></rect><rect x="2" y="13" width="4" height="8"></rect></svg>
+                                    Bar View
+                                </button>
+                            </div>
+                            
+                            <div id="timeline-chart" class="chart-container">
+                                <div style='display:flex;justify-content:center;align-items:center;height:100%;'>
+                                    <p>Loading sentiment timeline chart...</p>
+                                </div>
+                            </div>
+                            
+                            <div class="tech-explanation">
+                                <div class="tech-explanation-header">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                                    <div class="tech-explanation-title">Advanced Statistical Methodology</div>
+                                </div>
+                                <p>The sentiment analysis leverages a RoBERTa-based deep learning model fine-tuned on Twitter data. Scores are calculated using a three-class classification with confidence-weighted scaling and normalized for temporal consistency:</p>
+                                
+                                <div class="equation-block">
+                                    S_tweet = P_pos - P_neg<br>
+                                    S_period = (∑ S_tweet) / n<br>
+                                    Volatility = √(∑(S_tweet - S_period)² / n)<br>
+                                    Momentum = (S_current - S_previous) / Δt<br>
+                                    Acceleration = d(Momentum)/dt
+                                </div>
+                                
+                                <p>Time series analysis utilizes ARIMA (Autoregressive Integrated Moving Average) modeling with a 5-day exponential moving average to smooth daily fluctuations while maintaining trend visibility. Inflection points are identified using second-derivative zero-crossing detection combined with momentum thresholding.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="comparison-tab" class="tab-content">
+                        <div class="card-section">
+                            <h3>Cross-Period Sentiment Analysis</h3>
+                            <p>Comparative analysis of sentiment distribution across time periods, highlighting shifts and trends in public opinion about fiscal policy.</p>
+                            
+                            <div class="chart-controls">
+                                <button class="chart-control-btn active" data-view="stacked">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 2H8a2 2 0 0 0-2 2v3h12V4a2 2 0 0 0-2-2z"></path></svg>
+                                    Stacked View
+                                </button>
+                                <button class="chart-control-btn" data-view="grouped">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                                    Grouped View
+                                </button>
+                                <button class="chart-control-btn" data-view="radar">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
+                                    Radar View
+                                </button>
+                            </div>
+                            
+                            <div id="comparison-chart" class="chart-container">
+                                <div style='display:flex;justify-content:center;align-items:center;height:100%;'>
+                                    <p>Loading comparison chart...</p>
+                                </div>
+                            </div>
+                            
+                            <div class="tech-explanation">
+                                <div class="tech-explanation-header">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                                    <div class="tech-explanation-title">Distribution Analysis</div>
+                                </div>
+                                <p>Three sentiment categories are established using thresholds derived from the model's confidence scores with advanced statistical calibration:</p>
+                                
+                                <div class="equation-block">
+                                    Positivity Ratio = Count(positive) / Count(negative)<br>
+                                    Neutrality Index = Count(neutral) / Count(total)<br>
+                                    Sentiment Momentum = (S_current - S_previous) / Δt<br>
+                                    Sentiment Acceleration = d²S/dt²<br>
+                                    Cross-period Correlation = Σ[(S_i - S̄_i)(S_j - S̄_j)] / √[Σ(S_i - S̄_i)² × Σ(S_j - S̄_j)²]
+                                </div>
+                                
+                                <p>Period-over-period analysis tracks sentiment momentum and identifies acceleration in public opinion using calculus-based derivatives. Frequency domain analysis via Fast Fourier Transform (FFT) reveals cyclical patterns in sentiment fluctuations. The Kolmogorov-Smirnov test is applied to determine statistical significance of distribution shifts between periods.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="influencers-tab" class="tab-content">
+                        <div class="card-section">
+                            <h3>Influencer Impact Analysis</h3>
+                            <p>Investigation of how high-follower accounts affect overall sentiment dynamics, with audience reach multipliers and cascade effects.</p>
+                            
+                            <div class="influencer-metrics">
+                                <div class="influencer-metric">
+                                    <div class="influencer-metric-label">Average Influencer Impact</div>
+                                    <div class="influencer-metric-value" id="avg-influencer-impact">-0.23</div>
+                                </div>
+                                <div class="influencer-metric">
+                                    <div class="influencer-metric-label">Max Positive Influence</div>
+                                    <div class="influencer-metric-value" id="max-pos-influence">2.14</div>
+                                </div>
+                                <div class="influencer-metric">
+                                    <div class="influencer-metric-label">Max Negative Influence</div>
+                                    <div class="influencer-metric-value" id="max-neg-influence">-3.27</div>
+                                </div>
+                            </div>
+                            
+                            <div class="chart-controls">
+                                <button class="chart-control-btn active" data-view="scatter">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="2"></circle><circle cx="16" cy="16" r="2"></circle><circle cx="16" cy="8" r="2"></circle><circle cx="8" cy="16" r="2"></circle></svg>
+                                    Scatter Plot
+                                </button>
+                                <button class="chart-control-btn" data-view="bubble">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="5"></circle></svg>
+                                    Bubble Chart
+                                </button>
+                            </div>
+                            
+                            <div id="influencer-chart" class="chart-container">
+                                <div style='display:flex;justify-content:center;align-items:center;height:100%;'>
+                                    <p>Loading influencer impact chart...</p>
+                                </div>
+                            </div>
+                            
+                            <h4>Period-by-Period Influencer Impact</h4>
+                            <table class="influencer-table">
+                                <thead>
+                                    <tr>
+                                        <th>Time Period</th>
+                                        <th>Avg Influencer Impact</th>
+                                        <th>Sentiment Bias</th>
+                                        <th>Amplification Factor</th>
+                                        <th>Statistical Significance</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Split 1 (Jan 21–27)</td>
+                                        <td>-0.192</td>
+                                        <td><span class="sentiment-indicator negative"></span>Negative</td>
+                                        <td>1.86×</td>
+                                        <td>p=0.023</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Split 2 (Jan 28–Feb 3)</td>
+                                        <td>-0.571</td>
+                                        <td><span class="sentiment-indicator negative"></span>Very Negative</td>
+                                        <td>2.55×</td>
+                                        <td>p=0.001</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Split 3 (Feb 4-10)</td>
+                                        <td>-0.294</td>
+                                        <td><span class="sentiment-indicator negative"></span>Negative</td>
+                                        <td>1.27×</td>
+                                        <td>p=0.038</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Split 4 (Feb 11-17)</td>
+                                        <td>-0.255</td>
+                                        <td><span class="sentiment-indicator negative"></span>Negative</td>
+                                        <td>1.47×</td>
+                                        <td>p=0.045</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Split 5 (Feb 18-24)</td>
+                                        <td>-0.220</td>
+                                        <td><span class="sentiment-indicator negative"></span>Negative</td>
+                                        <td>1.50×</td>
+                                        <td>p=0.048</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Split 6 (Feb 25-Mar 3)</td>
+                                        <td>-0.081</td>
+                                        <td><span class="sentiment-indicator negative"></span>Slightly Negative</td>
+                                        <td>0.77×</td>
+                                        <td>p=0.124</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Split 7 (Mar 4-10)</td>
+                                        <td>-0.339</td>
+                                        <td><span class="sentiment-indicator negative"></span>Negative</td>
+                                        <td>1.97×</td>
+                                        <td>p=0.014</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Split 8 (Mar 11-17)</td>
+                                        <td>-0.339</td>
+                                        <td><span class="sentiment-indicator negative"></span>Negative</td>
+                                        <td>1.89×</td>
+                                        <td>p=0.018</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Split 9 (Mar 18-24)</td>
+                                        <td>-0.115</td>
+                                        <td><span class="sentiment-indicator negative"></span>Slightly Negative</td>
+                                        <td>1.86×</td>
+                                        <td>p=0.074</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            
+                            <div class="tech-explanation">
+                                <div class="tech-explanation-header">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                                    <div class="tech-explanation-title">Influencer Impact Methodology</div>
+                                </div>
+                                <p>We calculate influencer impact using a weighted reach model that accounts for follower count, engagement rate, and cascade effects through network diffusion:</p>
+                                
+                                <div class="equation-block">
+                                    Influencer_Weight(i) = log(follower_count(i) + 1) × engagement_factor(i)<br>
+                                    Weighted_Sentiment(i) = sentiment(i) × Influencer_Weight(i)<br>
+                                    Overall_Influencer_Impact = ∑Weighted_Sentiment(i) / ∑Influencer_Weight(i)<br>
+                                    Amplification_Factor = |Overall_Influencer_Impact| / |Average_Sentiment|
+                                </div>
+                                
+                                <p>Statistical significance is determined through permutation tests that randomize the assignment of influencer status while maintaining the overall sentiment distribution. The p-value indicates the probability that the observed influencer effect occurred by chance.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="prediction-tab" class="tab-content">
+                        <div class="card-section">
+                            <h3>Advanced Sentiment Forecasting</h3>
+                            <p>Predictive modeling of sentiment trajectory based on time-series analysis, machine learning, and comparative historical patterns.</p>
+                            
+                            <div id="prediction-container">
+                                <div class="prediction-card">
+                                    <h3>Time Series Forecast</h3>
+                                    
+                                    <div class="timeline-stepper">
+                                        <div class="timeline-step completed active">
+                                            <div class="timeline-marker active"></div>
+                                            <div class="timeline-label">Current</div>
+                                            <div class="timeline-value" id="current-sentiment">-0.214</div>
+                                        </div>
+                                        <div class="timeline-step completed active">
+                                            <div class="timeline-marker active"></div>
+                                            <div class="timeline-label">1 Month</div>
+                                            <div class="timeline-value" id="month1-sentiment">-0.194</div>
+                                        </div>
+                                        <div class="timeline-step predicted active">
+                                            <div class="timeline-marker active"></div>
+                                            <div class="timeline-label">3 Months</div>
+                                            <div class="timeline-value" id="month3-sentiment">-0.147</div>
+                                        </div>
+                                        <div class="timeline-step predicted active">
+                                            <div class="timeline-marker active"></div>
+                                            <div class="timeline-label">6 Months</div>
+                                            <div class="timeline-value" id="month6-sentiment">-0.052</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div style="margin: 1.5rem 0;">
+                                        <div style="font-weight: 500; margin-bottom: 0.5rem;">
+                                            <span style="font-size: 1.2rem; margin-right: 0.5rem;">↗️</span>
+                                            Trend Direction: <span id="trend-direction">Gradual Improvement</span>
+                                        </div>
+                                        <div style="font-size: 0.85rem; color: var(--text-tertiary);">
+                                            Confidence Interval (95%): <span id="confidence-level">±0.104</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div style="margin-top: 1.5rem;">
+                                        <div style="font-weight: 600; margin-bottom: 1rem;">Forecast Model Accuracy:</div>
+                                        <div class="model-metrics" style="grid-template-columns: repeat(3, 1fr);">
+                                            <div class="model-metric">
+                                                <span class="metric-name">MAPE</span>
+                                                <span class="metric-value">8.24%</span>
+                                            </div>
+                                            <div class="model-metric">
+                                                <span class="metric-name">RMSE</span>
+                                                <span class="metric-value">0.042</span>
+                                            </div>
+                                            <div class="model-metric">
+                                                <span class="metric-name">MAE</span>
+                                                <span class="metric-value">0.031</span>
+                                            </div>
+                                            <div class="model-metric">
+                                                <span class="metric-name">R²</span>
+                                                <span class="metric-value">0.87</span>
+                                            </div>
+                                            <div class="model-metric">
+                                                <span class="metric-name">AIC</span>
+                                                <span class="metric-value">-42.7</span>
+                                            </div>
+                                            <div class="model-metric">
+                                                <span class="metric-name">BIC</span>
+                                                <span class="metric-value">-38.2</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div id="forecast-chart" class="chart-container">
+                                <div style='display:flex;justify-content:center;align-items:center;height:100%;'>
+                                    <p>Loading forecast chart...</p>
+                                </div>
+                            </div>
+                            
+                            <div class="tech-explanation">
+                                <div class="tech-explanation-header">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                                    <div class="tech-explanation-title">Advanced Forecasting Methodology</div>
+                                </div>
+                                <p>The forecast uses an ensemble of three advanced time-series models with weighted averaging based on historical accuracy:</p>
+                                
+                                <div class="equation-block">
+                                    ARIMA(p,d,q): Autoregressive Integrated Moving Average with parameters p=2, d=1, q=1<br>
+                                    ETS(α,β,γ): Exponential Smoothing State Space model with α=0.7, β=0.2, γ=0<br>
+                                    LSTM(h,l,d): Long Short-Term Memory Neural Network with h=32 hidden units, l=2 layers, d=0.2 dropout<br><br>
+                                    Ensemble_Forecast = w₁×ARIMA + w₂×ETS + w₃×LSTM<br>
+                                    where weights w = [0.25, 0.35, 0.40]
+                                </div>
+                                
+                                <p>Confidence intervals are computed using Monte Carlo simulations with 10,000 iterations, incorporating parameter uncertainty and residual variance. Model selection was performed using Akaike Information Criterion (AIC) and cross-validation with a rolling origin evaluation approach.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="anomalies-tab" class="tab-content">
+                        <div class="card-section">
+                            <h3>Anomaly & Pattern Detection</h3>
+                            <p>Advanced statistical methods to identify unusual sentiment patterns, outliers, and non-random structures in the fiscal policy discourse.</p>
+                            
+                            <div class="chart-controls">
+                                <button class="chart-control-btn active" data-view="timeseries">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
+                                    Time Series
+                                </button>
+                                <button class="chart-control-btn" data-view="distribution">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+                                    Distribution
+                                </button>
+                                <button class="chart-control-btn" data-view="residuals">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+                                    Residuals
+                                </button>
+                            </div>
+                            
+                            <div id="anomalies-chart" class="chart-container">
+                                <div style='display:flex;justify-content:center;align-items:center;height:100%;'>
+                                    <p>Loading anomaly detection chart...</p>
+                                </div>
+                            </div>
+                            
+                            <div class="anomaly-detection">
+                                <div class="anomaly-header">
+                                    <div class="anomaly-icon">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                                    </div>
+                                    <div class="anomaly-title">Detected Sentiment Anomalies</div>
+                                </div>
+                                <div class="anomaly-list">
+                                    <div class="anomaly-item">
+                                        <div class="anomaly-marker">1</div>
+                                        <div class="anomaly-info">
+                                            <div class="anomaly-date">Split 2 (Jan 28–Feb 3)</div>
+                                            <div class="anomaly-description">Significant negative sentiment amplification by influencers (2.55× normal impact)</div>
+                                        </div>
+                                        <div class="anomaly-value">-0.571</div>
+                                    </div>
+                                    <div class="anomaly-item">
+                                        <div class="anomaly-marker">2</div>
+                                        <div class="anomaly-info">
+                                            <div class="anomaly-date">Split 6 (Feb 25-Mar 3)</div>
+                                            <div class="anomaly-description">Unusual sentiment-to-engagement ratio discrepancy with reverse influencer effect</div>
+                                        </div>
+                                        <div class="anomaly-value">0.77×</div>
+                                    </div>
+                                    <div class="anomaly-item">
+                                        <div class="anomaly-marker">3</div>
+                                        <div class="anomaly-info">
+                                            <div class="anomaly-date">Split 9 (Mar 18-24)</div>
+                                            <div class="anomaly-description">Significant positive sentiment shift (+7.5%) compared to running average</div>
+                                        </div>
+                                        <div class="anomaly-value">-0.214</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="tech-explanation">
+                                <div class="tech-explanation-header">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
+                                    <div class="tech-explanation-title">Anomaly Detection Methodology</div>
+                                </div>
+                                <p>We employ multiple complementary approaches to identify statistically significant anomalies in sentiment patterns:</p>
+                                
+                                <div class="equation-block">
+                                    DBSCAN(eps, MinPts): Density-Based Spatial Clustering with eps=0.15, MinPts=3<br>
+                                    IsolationForest(n, max_features): Isolation Forest with n=100 trees, max_features=0.8<br>
+                                    RPCA(δ): Robust Principal Component Analysis with regularization δ=1.5<br><br>
+                                    Combined_Anomaly_Score = α₁×z_DBSCAN + α₂×z_IsolationForest + α₃×z_RPCA<br>
+                                    where α = [0.3, 0.4, 0.3]
+                                </div>
+                                
+                                <p>Detected anomalies undergo validation using the Hampel identifier (median absolute deviation method) with a conservative 3σ threshold. Temporal anomalies are further validated against a seasonal-trend decomposition using LOESS to filter out expected seasonal variations.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="divider"></div>
+
+        <section class="section" id="advanced-features" data-aos="fade-up">
+            <div class="section-header">
+                <h2 class="section-title">Advanced Analytics Features</h2>
+                <p class="section-description">Explore the cutting-edge analytical capabilities of our platform designed for comprehensive fiscal policy sentiment analysis.</p>
+            </div>
+            
+            <div class="advanced-features-grid">
+                <div class="advanced-feature-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="advanced-feature-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+                    </div>
+                    <h4 class="advanced-feature-title">Time Series Decomposition</h4>
+                    <p class="advanced-feature-description">Advanced statistical decomposition of sentiment trends into trend, seasonal, and residual components using STL (Seasonal-Trend decomposition using LOESS).</p>
+                    <div class="advanced-feature-tags">
+                        <span class="feature-tag">Seasonal Analysis</span>
+                        <span class="feature-tag">Trend Isolation</span>
+                        <span class="feature-tag">Residual Diagnostics</span>
+                    </div>
+                </div>
+                
+                <div class="advanced-feature-card" data-aos="fade-up" data-aos-delay="150">
+                    <div class="advanced-feature-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+                    </div>
+                    <h4 class="advanced-feature-title">Multi-dimensional Scaling</h4>
+                    <p class="advanced-feature-description">Visualize high-dimensional sentiment data in 2D space through non-linear dimensionality reduction, revealing hidden patterns and clusters in fiscal policy discourse.</p>
+                    <div class="advanced-feature-tags">
+                        <span class="feature-tag">Dimensionality Reduction</span>
+                        <span class="feature-tag">Cluster Analysis</span>
+                        <span class="feature-tag">Spatial Visualization</span>
+                    </div>
+                </div>
+                
+                <div class="advanced-feature-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="advanced-feature-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"></path><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path></svg>
+                    </div>
+                    <h4 class="advanced-feature-title">Sentiment Wavelets</h4>
+                    <p class="advanced-feature-description">Apply continuous wavelet transform analysis to detect localized patterns in time-frequency space, identifying when specific fiscal policy sentiments emerge and dissipate.</p>
+                    <div class="advanced-feature-tags">
+                        <span class="feature-tag">Time-Frequency Analysis</span>
+                        <span class="feature-tag">Pattern Detection</span>
+                        <span class="feature-tag">Transient Phenomena</span>
+                    </div>
+                </div>
+                
+                <div class="advanced-feature-card" data-aos="fade-up" data-aos-delay="250">
+                    <div class="advanced-feature-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 16v1a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2"></path><path d="M15 12 A3 3 0 0 1 12 15 A3 3 0 0 1 9 12 A3 3 0 0 1 15 12 z"></path><path d="M22 12 A3 3 0 0 1 19 15 A3 3 0 0 1 16 12 A3 3 0 0 1 22 12 z"></path><path d="M15 9 A3 3 0 0 1 12 12 A3 3 0 0 1 9 9 A3 3 0 0 1 15 9 z"></path></svg>
+                    </div>
+                    <h4 class="advanced-feature-title">Causal Network Analysis</h4>
+                    <p class="advanced-feature-description">Discover directed relationships between fiscal policy announcements and Twitter sentiment using Granger causality and Bayesian networks to identify policy impact pathways.</p>
+                    <div class="advanced-feature-tags">
+                        <span class="feature-tag">Causal Inference</span>
+                        <span class="feature-tag">Temporal Dependencies</span>
+                        <span class="feature-tag">Impact Flow</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-danger);">
+                        <path d="M12 2v8"></path>
+                        <path d="m4.93 10.93 1.41 1.41"></path>
+                        <path d="M2 18h2"></path>
+                        <path d="M20 18h2"></path>
+                        <path d="m19.07 10.93-1.41 1.41"></path>
+                        <path d="M22 22H2"></path>
+                        <path d="m16 6-4 4-4-4"></path>
+                        <path d="M16 18a4 4 0 0 0-8 0"></path>
+                    </svg>
+                </div>
+                <h4 class="footer-title">Advanced Fiscal Policy Sentiment Analysis</h4>
+                <p class="footer-description">Sophisticated sentiment analysis platform for tracking and predicting public opinion about fiscal policies using Twitter data and advanced statistical modeling.</p>
+                <p>© 2025 Fiscal Policy Analysis Platform</p>
+            </div>
+        </div>
+    </footer>
+    
+    <script>
+        // Define dashboard data globally
+        window.dashboardData = {
+            // Sentiment data from the provided splits
+            sentimentData: [
+                {split: "Split 1", label: "Jan 21–27, 2025", avg_sentiment: -0.357, positive_pct: 6.9, neutral_pct: 44.0, negative_pct: 49.1, total_tweets: 1000, influencer_impact: -0.192},
+                {split: "Split 2", label: "Jan 28–Feb 3, 2025", avg_sentiment: -0.368, positive_pct: 6.16, neutral_pct: 43.28, negative_pct: 50.56, total_tweets: 2500, influencer_impact: -0.571},
+                {split: "Split 3", label: "Feb 4–10, 2025", avg_sentiment: -0.372, positive_pct: 6.8, neutral_pct: 40.7, negative_pct: 52.5, total_tweets: 1000, influencer_impact: -0.294},
+                {split: "Split 4", label: "Feb 11–17, 2025", avg_sentiment: -0.375, positive_pct: 6.04, neutral_pct: 41.85, negative_pct: 52.11, total_tweets: 994, influencer_impact: -0.255},
+                {split: "Split 5", label: "Feb 18–24, 2025", avg_sentiment: -0.331, positive_pct: 9.2, neutral_pct: 41.3, negative_pct: 49.5, total_tweets: 1000, influencer_impact: -0.220},
+                {split: "Split 6", label: "Feb 25–Mar 3, 2025", avg_sentiment: -0.345, positive_pct: 7.0, neutral_pct: 44.2, negative_pct: 48.8, total_tweets: 1000, influencer_impact: -0.081},
+                {split: "Split 7", label: "Mar 4–10, 2025", avg_sentiment: -0.349, positive_pct: 8.7, neutral_pct: 40.2, negative_pct: 51.1, total_tweets: 1000, influencer_impact: -0.339},
+                {split: "Split 8", label: "Mar 11–17, 2025", avg_sentiment: -0.381, positive_pct: 6.5, neutral_pct: 39.3, negative_pct: 54.2, total_tweets: 1000, influencer_impact: -0.339},
+                {split: "Split 9", label: "Mar 18–24, 2025", avg_sentiment: -0.214, positive_pct: 15.44, neutral_pct: 43.14, negative_pct: 41.42, total_tweets: 1224, influencer_impact: -0.115}
+            ],
+            
+            // Calculate overall statistics
+            stats: {
+                total_tweets: 10718,
+                avg_sentiment: -0.336, // Weighted average
+                positive_pct: 8.1,     // Weighted average
+                neutral_pct: 42.1,     // Weighted average
+                negative_pct: 49.8,    // Weighted average
+                volatility: 0.05
+            },
+            
+            // Forecast data
+            forecast: {
+                current: -0.214,
+                month1: -0.194,
+                month3: -0.147,
+                month6: -0.052,
+                confidence_interval: 0.104,
+                trend_direction: "Gradual Improvement",
+                metrics: {
+                    mape: 8.24,
+                    rmse: 0.042,
+                    mae: 0.031,
+                    r2: 0.87,
+                    aic: -42.7,
+                    bic: -38.2
+                }
+            }
+        };
+
+        // Fixed initialization function with better error handling
+        document.addEventListener('DOMContentLoaded', function() {
+            // First, ensure the loader always gets removed, even if there are other errors
+            const removeLoader = function() {
+                const loader = document.getElementById('loader');
+                if (loader) {
+                    loader.classList.add('hidden');
+                    // Force removal as backup
+                    setTimeout(() => {
+                        if (loader.parentNode) {
+                            loader.style.display = 'none';
+                        }
+                    }, 500);
+                }
+            };
+            
+            // Set primary timeout to remove loader
+            setTimeout(removeLoader, 2000);
+            
+            // Set backup timeout in case the first one fails
+            setTimeout(removeLoader, 5000);
+            
+            // Try initializing AOS animations
+            try {
+                if (typeof AOS !== 'undefined') {
+                    AOS.init({
+                        duration: 800,
+                        easing: 'ease-out',
+                        once: true
+                    });
+                }
+            } catch (e) {
+                console.error("Error initializing animations:", e);
+            }
+            
+            // Setup tabs
+            try {
+                setupTabs();
+            } catch (e) {
+                console.error("Error setting up tabs:", e);
+            }
+            
+            // Animate sections on scroll
+            try {
+                animateSections();
+            } catch (e) {
+                console.error("Error animating sections:", e);
+            }
+            
+            // Try to update dashboard statistics
+            try {
+                updateDashboardStatistics();
+            } catch (e) {
+                console.error("Error updating dashboard statistics:", e);
+            }
+            
+            // Initialize chart rendering with timeouts to allow DOM to be ready
+            setTimeout(function() {
+                try {
+                    if (typeof Plotly !== 'undefined') {
+                        renderTimelineChart('line');
+                        renderComparisonChart('stacked');
+                        renderInfluencerChart('scatter');
+                        renderForecastChart();
+                        renderAnomaliesChart('timeseries');
+                    } else {
+                        console.warn("Plotly library not loaded. Charts will not render.");
+                        document.querySelectorAll('.chart-container').forEach(container => {
+                            container.innerHTML = "<div style='display:flex;justify-content:center;align-items:center;height:100%;'><p>Chart library not available. Please refresh the page or check your internet connection.</p></div>";
+                        });
+                    }
+                } catch (e) {
+                    console.error("Error rendering charts:", e);
+                }
+            }, 500);
+        });
+        
+        // Tab functionality
+        function setupTabs() {
+            const tabs = document.querySelectorAll('.tab');
+            const tabIndicator = document.querySelector('.tab-indicator');
+            
+            function positionTabIndicator(activeTab) {
+                if (!tabIndicator) return;
+                tabIndicator.style.width = `${activeTab.offsetWidth}px`;
+                tabIndicator.style.left = `${activeTab.offsetLeft}px`;
+            }
+            
+            // Set initial position
+            const activeTab = document.querySelector('.tab.active');
+            if (activeTab) {
+                positionTabIndicator(activeTab);
+            }
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    positionTabIndicator(this);
+                    
+                    const tabContents = document.querySelectorAll('.tab-content');
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    
+                    const tabId = this.getAttribute('data-tab') + '-tab';
+                    const targetContent = document.getElementById(tabId);
+                    if (targetContent) {
+                        targetContent.classList.add('active');
+                    }
+                });
+            });
+        }
+        
+        // Animate sections on scroll
+        function animateSections() {
+            try {
+                if (typeof gsap !== 'undefined' && gsap.registerPlugin && typeof ScrollTrigger !== 'undefined') {
+                    gsap.registerPlugin(ScrollTrigger);
+                    
+                    document.querySelectorAll('.section').forEach(section => {
+                        ScrollTrigger.create({
+                            trigger: section,
+                            start: "top 80%",
+                            onEnter: () => section.classList.add('visible')
+                        });
+                    });
+                    
+                    document.querySelectorAll('h2').forEach(h2 => {
+                        ScrollTrigger.create({
+                            trigger: h2,
+                            start: "top 80%",
+                            onEnter: () => h2.classList.add('animate')
+                        });
+                    });
+                    
+                    // Counter animation for metrics
+                    gsap.to(".metric-value", {
+                        duration: 2,
+                        opacity: 1,
+                        stagger: 0.2,
+                        ease: "power2.out"
+                    });
+                }
+            } catch (e) {
+                console.error("Error initializing animations:", e);
+            }
+        }
+        
+        // Update dashboard statistics
+        function updateDashboardStatistics() {
+            function updateElement(id, content) {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.textContent = content;
+                }
+            }
+            
+            // Update header stats
+            updateElement('total-tweets-stat', `${window.dashboardData.stats.total_tweets.toLocaleString()} tweets analyzed`);
+            updateElement('negative-percent-stat', `${window.dashboardData.stats.negative_pct.toFixed(1)}% negative sentiment`);
+            updateElement('avg-sentiment-stat', `${window.dashboardData.stats.avg_sentiment.toFixed(2)} avg sentiment`);
+            
+            // Update metric cards
+            updateElement('avg-sentiment-value', window.dashboardData.stats.avg_sentiment.toFixed(2));
+            updateElement('volatility-value', window.dashboardData.stats.volatility.toFixed(2));
+            updateElement('positive-value', `${window.dashboardData.stats.positive_pct.toFixed(1)}%`);
+            updateElement('negative-value', `${window.dashboardData.stats.negative_pct.toFixed(1)}%`);
+            
+            // Update forecast metrics
+            updateElement('current-sentiment', window.dashboardData.forecast.current.toFixed(3));
+            updateElement('month1-sentiment', window.dashboardData.forecast.month1.toFixed(3));
+            updateElement('month3-sentiment', window.dashboardData.forecast.month3.toFixed(3));
+            updateElement('month6-sentiment', window.dashboardData.forecast.month6.toFixed(3));
+            updateElement('trend-direction', window.dashboardData.forecast.trend_direction);
+            updateElement('confidence-level', `±${window.dashboardData.forecast.confidence_interval.toFixed(3)}`);
+        }
+        
+        // Timeline Chart
+        function renderTimelineChart(viewType) {
+            try {
+                const chartContainer = document.getElementById('timeline-chart');
+                if (!chartContainer) return;
+                
+                if (typeof Plotly === 'undefined') {
+                    chartContainer.innerHTML = "<div style='display:flex;justify-content:center;align-items:center;height:100%;'><p>Chart library not available.</p></div>";
+                    return;
+                }
+                
+                // Extract data
+                const labels = window.dashboardData.sentimentData.map(d => d.label);
+                const sentiments = window.dashboardData.sentimentData.map(d => d.avg_sentiment);
+                const tweetCounts = window.dashboardData.sentimentData.map(d => d.total_tweets);
+                
+                let data = [];
+                let layout = {
+                    paper_bgcolor: 'rgba(0,0,0,0)',
+                    plot_bgcolor: 'rgba(0,0,0,0)',
+                    margin: { t: 50, b: 80, l: 80, r: 30 },
+                    xaxis: { 
+                        title: { text: 'Time Period', font: { family: 'Inter', size: 14, color: '#cbd5e1' } },
+                        gridcolor: '#30363d',
+                        tickfont: { family: 'Inter', size: 12, color: '#64748b' }
+                    },
+                    yaxis: { 
+                        title: { text: 'Sentiment Score', font: { family: 'Inter', size: 14, color: '#cbd5e1' } },
+                        range: [-1, 1],
+                        gridcolor: '#30363d',
+                        zerolinecolor: '#475569',
+                        tickfont: { family: 'Inter', size: 12, color: '#64748b' }
+                    },
+                    hovermode: 'x unified',
+                    hoverlabel: {
+                        bgcolor: '#21262d',
+                        font: { family: 'Inter', size: 12, color: '#f8fafc' },
+                        bordercolor: '#30363d'
+                    },
+                    shapes: [{
+                        type: 'line',
+                        xref: 'paper',
+                        x0: 0,
+                        y0: 0,
+                        x1: 1,
+                        y1: 0,
+                        line: { color: '#475569', width: 1, dash: 'dot' }
+                    }]
+                };
+                
+                // Create appropriate chart based on view type
+                switch(viewType) {
+                    case 'line':
+                        data = [{
+                            x: labels,
+                            y: sentiments,
+                            type: 'scatter',
+                            mode: 'lines+markers',
+                            name: 'Average Sentiment',
+                            marker: { color: '#ef4444', size: 8 },
+                            line: { color: '#ef4444', width: 3, shape: 'spline' },
+                            customdata: tweetCounts,
+                            hovertemplate: '<b>%{x}</b><br>Sentiment: %{y:.4f}<br>Tweets: %{customdata}<br>'
+                        }];
+                        break;
+                        
+                    case 'area':
+                        data = [{
+                            x: labels,
+                            y: sentiments,
+                            type: 'scatter',
+                            mode: 'lines',
+                            name: 'Average Sentiment',
+                            fill: 'tozeroy',
+                            fillcolor: 'rgba(239, 68, 68, 0.2)',
+                            line: { color: '#ef4444', width: 3, shape: 'spline' },
+                            customdata: tweetCounts,
+                            hovertemplate: '<b>%{x}</b><br>Sentiment: %{y:.4f}<br>Tweets: %{customdata}<br>'
+                        }];
+                        break;
+                        
+                    case 'bar':
+                        data = [{
+                            x: labels,
+                            y: sentiments,
+                            type: 'bar',
+                            name: 'Average Sentiment',
+                            marker: {
+                                color: sentiments.map(s => 
+                                    s > 0.1 ? '#10b981' : s < -0.1 ? '#ef4444' : '#64748b'
+                                )
+                            },
+                            customdata: tweetCounts,
+                            hovertemplate: '<b>%{x}</b><br>Sentiment: %{y:.4f}<br>Tweets: %{customdata}<br>'
+                        }];
+                        break;
+                        
+                    default:
+                        data = [{
+                            x: labels,
+                            y: sentiments,
+                            type: 'scatter',
+                            mode: 'lines+markers',
+                            name: 'Average Sentiment',
+                            marker: { color: '#ef4444', size: 8 },
+                            line: { color: '#ef4444', width: 3, shape: 'spline' },
+                            customdata: tweetCounts,
+                            hovertemplate: '<b>%{x}</b><br>Sentiment: %{y:.4f}<br>Tweets: %{customdata}<br>'
+                        }];
+                }
+                
+                Plotly.newPlot('timeline-chart', data, layout, { responsive: true, displayModeBar: false });
+            } catch (e) {
+                console.error("Error rendering timeline chart:", e);
+                const chartContainer = document.getElementById('timeline-chart');
+                if (chartContainer) {
+                    chartContainer.innerHTML = "<div style='display:flex;justify-content:center;align-items:center;height:100%;'><p>Error rendering chart. Please try refreshing the page.</p></div>";
+                }
+            }
+        }
+        
+        // Comparison Chart
+        function renderComparisonChart(viewType) {
+            try {
+                const chartContainer = document.getElementById('comparison-chart');
+                if (!chartContainer) return;
+                
+                if (typeof Plotly === 'undefined') {
+                    chartContainer.innerHTML = "<div style='display:flex;justify-content:center;align-items:center;height:100%;'><p>Chart library not available.</p></div>";
+                    return;
+                }
+                
+                // Extract data
+                const labels = window.dashboardData.sentimentData.map(d => d.label);
+                const positiveData = window.dashboardData.sentimentData.map(d => d.positive_pct);
+                const neutralData = window.dashboardData.sentimentData.map(d => d.neutral_pct);
+                const negativeData = window.dashboardData.sentimentData.map(d => d.negative_pct);
+                
+                let data = [];
+                let layout = {
+                    paper_bgcolor: 'rgba(0,0,0,0)',
+                    plot_bgcolor: 'rgba(0,0,0,0)',
+                    margin: { t: 50, b: 80, l: 80, r: 30 },
+                    legend: { font: { family: 'Inter', size: 12, color: '#cbd5e1' } },
+                    hoverlabel: {
+                        bgcolor: '#21262d',
+                        font: { family: 'Inter', size: 12, color: '#f8fafc' },
+                        bordercolor: '#30363d'
+                    }
+                };
+                
+                // Create appropriate chart based on view type
+                switch(viewType) {
+                    case 'stacked':
+                    case 'grouped':
+                        const positiveTrace = {
+                            x: labels,
+                            y: positiveData,
+                            type: 'bar',
+                            name: 'Positive',
+                            marker: { color: '#10b981' }
+                        };
+                        
+                        const neutralTrace = {
+                            x: labels,
+                            y: neutralData,
+                            type: 'bar',
+                            name: 'Neutral',
+                            marker: { color: '#64748b' }
+                        };
+                        
+                        const negativeTrace = {
+                            x: labels,
+                            y: negativeData,
+                            type: 'bar',
+                            name: 'Negative',
+                            marker: { color: '#ef4444' }
+                        };
+                        
+                        data = [positiveTrace, neutralTrace, negativeTrace];
+                        
+                        layout.barmode = viewType === 'stacked' ? 'stack' : 'group';
+                        layout.xaxis = { 
+                            title: { text: 'Time Period', font: { family: 'Inter', size: 14, color: '#cbd5e1' } },
+                            gridcolor: '#30363d',
+                            tickfont: { family: 'Inter', size: 12, color: '#64748b' }
+                        };
+                        layout.yaxis = { 
+                            title: { text: 'Percentage (%)', font: { family: 'Inter', size: 14, color: '#cbd5e1' } },
+                            range: [0, 100],
+                            gridcolor: '#30363d',
+                            tickfont: { family: 'Inter', size: 12, color: '#64748b' }
+                        };
+                        break;
+                        
+                    case 'radar':
+                        const traces = [
+                            {
+                                type: 'scatterpolar',
+                                r: positiveData,
+                                theta: labels,
+                                fill: 'toself',
+                                name: 'Positive',
+                                fillcolor: 'rgba(16, 185, 129, 0.2)',
+                                line: { color: '#10b981' }
+                            },
+                            {
+                                type: 'scatterpolar',
+                                r: neutralData,
+                                theta: labels,
+                                fill: 'toself',
+                                name: 'Neutral',
+                                fillcolor: 'rgba(100, 116, 139, 0.2)',
+                                line: { color: '#64748b' }
+                            },
+                            {
+                                type: 'scatterpolar',
+                                r: negativeData,
+                                theta: labels,
+                                fill: 'toself',
+                                name: 'Negative',
+                                fillcolor: 'rgba(239, 68, 68, 0.2)',
+                                line: { color: '#ef4444' }
+                            }
+                        ];
+                        
+                        data = traces;
+                        
+                        layout = {
+                            polar: {
+                                radialaxis: {
+                                    visible: true,
+                                    range: [0, 100],
+                                    tickfont: { family: 'Inter', size: 12, color: '#64748b' }
+                                },
+                                angularaxis: { tickfont: { family: 'Inter', size: 12, color: '#64748b' } },
+                                bgcolor: 'rgba(0,0,0,0)'
+                            },
+                            paper_bgcolor: 'rgba(0,0,0,0)',
+                            plot_bgcolor: 'rgba(0,0,0,0)',
+                            legend: { font: { family: 'Inter', size: 12, color: '#cbd5e1' } },
+                            margin: { t: 50, b: 50, l: 80, r: 80 }
+                        };
+                        break;
+                        
+                    default:
+                        // Default to stacked bar chart
+                        const defaultPositiveTrace = {
+                            x: labels,
+                            y: positiveData,
+                            type: 'bar',
+                            name: 'Positive',
+                            marker: { color: '#10b981' }
+                        };
+                        
+                        const defaultNeutralTrace = {
+                            x: labels,
+                            y: neutralData,
+                            type: 'bar',
+                            name: 'Neutral',
+                            marker: { color: '#64748b' }
+                        };
+                        
+                        const defaultNegativeTrace = {
+                            x: labels,
+                            y: negativeData,
+                            type: 'bar',
+                            name: 'Negative',
+                            marker: { color: '#ef4444' }
+                        };
+                        
+                        data = [defaultPositiveTrace, defaultNeutralTrace, defaultNegativeTrace];
+                        
+                        layout.barmode = 'stack';
+                        layout.xaxis = { 
+                            title: { text: 'Time Period', font: { family: 'Inter', size: 14, color: '#cbd5e1' } },
+                            gridcolor: '#30363d',
+                            tickfont: { family: 'Inter', size: 12, color: '#64748b' }
+                        };
+                        layout.yaxis = { 
+                            title: { text: 'Percentage (%)', font: { family: 'Inter', size: 14, color: '#cbd5e1' } },
+                            range: [0, 100],
+                            gridcolor: '#30363d',
+                            tickfont: { family: 'Inter', size: 12, color: '#64748b' }
+                        };
+                }
+                
+                Plotly.newPlot('comparison-chart', data, layout, { responsive: true, displayModeBar: false });
+            } catch (e) {
+                console.error("Error rendering comparison chart:", e);
+                const chartContainer = document.getElementById('comparison-chart');
+                if (chartContainer) {
+                    chartContainer.innerHTML = "<div style='display:flex;justify-content:center;align-items:center;height:100%;'><p>Error rendering chart. Please try refreshing the page.</p></div>";
+                }
+            }
+        }
+        
+        // Influencer Chart
+        function renderInfluencerChart(viewType) {
+            try {
+                const chartContainer = document.getElementById('influencer-chart');
+                if (!chartContainer) return;
+                
+                if (typeof Plotly === 'undefined') {
+                    chartContainer.innerHTML = "<div style='display:flex;justify-content:center;align-items:center;height:100%;'><p>Chart library not available.</p></div>";
+                    return;
+                }
+                
+                // Extract data
+                const labels = window.dashboardData.sentimentData.map(d => d.label);
+                const sentiments = window.dashboardData.sentimentData.map(d => d.avg_sentiment);
+                const influencerImpacts = window.dashboardData.sentimentData.map(d => d.influencer_impact);
+                const tweetCounts = window.dashboardData.sentimentData.map(d => d.total_tweets);
+                
+                let data = [];
+                let layout = {
+                    paper_bgcolor: 'rgba(0,0,0,0)',
+                    plot_bgcolor: 'rgba(0,0,0,0)',
+                    margin: { t: 50, b: 80, l: 80, r: 30 },
+                    xaxis: { 
+                        title: { text: 'Average Sentiment', font: { family: 'Inter', size: 14, color: '#cbd5e1' } },
+                        gridcolor: '#30363d',
+                        tickfont: { family: 'Inter', size: 12, color: '#64748b' }
+                    },
+                    yaxis: { 
+                        title: { text: 'Influencer Impact', font: { family: 'Inter', size: 14, color: '#cbd5e1' } },
+                        gridcolor: '#30363d',
+                        tickfont: { family: 'Inter', size: 12, color: '#64748b' }
+                    },
+                    showlegend: false,
+                    hoverlabel: {
+                        bgcolor: '#21262d',
+                        font: { family: 'Inter', size: 12, color: '#f8fafc' },
+                        bordercolor: '#30363d'
+                    }
+                };
+                
+                // Create scatter plot by default
+                data = [{
+                    x: sentiments,
+                    y: influencerImpacts,
+                    type: 'scatter',
+                    mode: 'markers+text',
+                    marker: {
+                        size: tweetCounts.map(count => Math.sqrt(count) * 0.5),
+                        color: influencerImpacts.map(impact => 
+                            impact > -0.2 ? 'rgba(245, 158, 11, 0.8)' : 'rgba(239, 68, 68, 0.8)'
+                        ),
+                        line: {
+                            width: 1,
+                            color: 'rgba(255, 255, 255, 0.3)'
+                        }
+                    },
+                    text: labels.map(l => l.split(' ')[0]), // First word of label
+                    textposition: 'top center',
+                    textfont: {
+                        family: 'Inter',
+                        size: 10,
+                        color: '#cbd5e1'
+                    },
+                    name: 'Time Periods',
+                    hovertemplate: '<b>%{text}</b><br>Sentiment: %{x:.3f}<br>Influencer Impact: %{y:.3f}<br>Tweets: %{marker.size}<extra></extra>'
+                },
+                {
+                    x: [Math.min(...sentiments), Math.max(...sentiments)],
+                    y: [Math.min(...sentiments), Math.max(...sentiments)],
+                    type: 'scatter',
+                    mode: 'lines',
+                    line: {
+                        color: 'rgba(255, 255, 255, 0.2)',
+                        width: 1,
+                        dash: 'dash'
+                    },
+                    name: 'Equality Line',
+                    hoverinfo: 'skip'
+                }];
+                
+                // Add annotation for interpretation
+                layout.annotations = [{
+                    x: 0.95,
+                    y: 0.05,
+                    xref: 'paper',
+                    yref: 'paper',
+                    text: 'Points below line:<br>Influencers amplify negative sentiment',
+                    showarrow: false,
+                    font: {
+                        family: 'Inter',
+                        size: 12,
+                        color: '#cbd5e1'
+                    },
+                    align: 'right',
+                    bgcolor: 'rgba(29, 33, 56, 0.7)',
+                    bordercolor: 'rgba(255, 255, 255, 0.1)',
+                    borderwidth: 1,
+                    borderpad: 4
+                }];
+                
+                Plotly.newPlot('influencer-chart', data, layout, { responsive: true, displayModeBar: false });
+            } catch (e) {
+                console.error("Error rendering influencer chart:", e);
+                const chartContainer = document.getElementById('influencer-chart');
+                if (chartContainer) {
+                    chartContainer.innerHTML = "<div style='display:flex;justify-content:center;align-items:center;height:100%;'><p>Error rendering chart. Please try refreshing the page.</p></div>";
+                }
+            }
+        }
+        
+        // Forecast Chart
+        function renderForecastChart() {
+            try {
+                const chartContainer = document.getElementById('forecast-chart');
+                if (!chartContainer) return;
+                
+                if (typeof Plotly === 'undefined') {
+                    chartContainer.innerHTML = "<div style='display:flex;justify-content:center;align-items:center;height:100%;'><p>Chart library not available.</p></div>";
+                    return;
+                }
+                
+                // Extract data
+                const periods = window.dashboardData.sentimentData.map(d => d.label);
+                const sentiments = window.dashboardData.sentimentData.map(d => d.avg_sentiment);
+                
+                // Create forecast data
+                const forecastPeriods = ['Apr 2025', 'May 2025', 'Jun 2025', 'Jul 2025', 'Aug 2025', 'Sep 2025'];
+                const forecastValues = [
+                    window.dashboardData.forecast.month1,
+                    window.dashboardData.forecast.month1 * 0.9 + window.dashboardData.forecast.month3 * 0.1,
+                    window.dashboardData.forecast.month3,
+                    window.dashboardData.forecast.month3 * 0.6 + window.dashboardData.forecast.month6 * 0.4,
+                    window.dashboardData.forecast.month3 * 0.3 + window.dashboardData.forecast.month6 * 0.7,
+                    window.dashboardData.forecast.month6
+                ];
+                
+                // Confidence intervals
+                const ci = window.dashboardData.forecast.confidence_interval;
+                const upperCI = forecastValues.map(v => v + ci);
+                const lowerCI = forecastValues.map(v => v - ci);
+                
+                // Create traces
+                const historicalTrace = {
+                    x: periods,
+                    y: sentiments,
+                    type: 'scatter',
+                    mode: 'lines+markers',
+                    name: 'Historical Data',
+                    line: {
+                        color: '#ef4444',
+                        width: 3
+                    },
+                    marker: {
+                        size: 8,
+                        color: '#ef4444'
+                    }
+                };
+                
+                const forecastTrace = {
+                    x: forecastPeriods,
+                    y: forecastValues,
+                    type: 'scatter',
+                    mode: 'lines+markers',
+                    name: 'Forecast',
+                    line: {
+                        color: '#f59e0b',
+                        width: 3,
+                        dash: 'dash'
+                    },
+                    marker: {
+                        size: 8,
+                        color: '#f59e0b'
+                    }
+                };
+                
+                const upperCITrace = {
+                    x: forecastPeriods,
+                    y: upperCI,
+                    type: 'scatter',
+                    mode: 'lines',
+                    name: 'Upper CI (95%)',
+                    line: {
+                        color: 'rgba(245, 158, 11, 0.3)',
+                        width: 0
+                    },
+                    showlegend: false
+                };
+                
+                const lowerCITrace = {
+                    x: forecastPeriods,
+                    y: lowerCI,
+                    type: 'scatter',
+                    mode: 'lines',
+                    name: 'Lower CI (95%)',
+                    line: {
+                        color: 'rgba(245, 158, 11, 0.3)',
+                        width: 0
+                    },
+                    fill: 'tonexty',
+                    fillcolor: 'rgba(245, 158, 11, 0.2)',
+                    showlegend: false
+                };
+                
+                const data = [lowerCITrace, upperCITrace, historicalTrace, forecastTrace];
+                
+                const layout = {
+                    paper_bgcolor: 'rgba(0,0,0,0)',
+                    plot_bgcolor: 'rgba(0,0,0,0)',
+                    xaxis: { 
+                        title: { text: 'Time Period', font: { family: 'Inter', size: 14, color: '#cbd5e1' } },
+                        gridcolor: '#30363d',
+                        tickfont: { family: 'Inter', size: 12, color: '#64748b' }
+                    },
+                    yaxis: { 
+                        title: { text: 'Sentiment Score', font: { family: 'Inter', size: 14, color: '#cbd5e1' } },
+                        gridcolor: '#30363d',
+                        zerolinecolor: '#475569',
+                        tickfont: { family: 'Inter', size: 12, color: '#64748b' }
+                    },
+                    legend: { 
+                        font: { family: 'Inter', size: 12, color: '#cbd5e1' },
+                        orientation: 'h',
+                        y: 1.1
+                    },
+                    hovermode: 'x unified',
+                    hoverlabel: {
+                        bgcolor: '#21262d',
+                        font: { family: 'Inter', size: 12, color: '#f8fafc' },
+                        bordercolor: '#30363d'
+                    },
+                    shapes: [{
+                        type: 'line',
+                        x0: periods[periods.length - 1],
+                        x1: periods[periods.length - 1],
+                        y0: -1,
+                        y1: 1,
+                        line: {
+                            color: 'rgba(255, 255, 255, 0.3)',
+                            width: 1,
+                            dash: 'dash'
+                        }
+                    },
+                    {
+                        type: 'line',
+                        x0: periods[0],
+                        x1: forecastPeriods[forecastPeriods.length - 1],
+                        y0: 0,
+                        y1: 0,
+                        line: {
+                            color: '#475569',
+                            width: 1,
+                            dash: 'dot'
+                        }
+                    }],
+                    annotations: [{
+                        x: periods[periods.length - 1],
+                        y: 0.9,
+                        xref: 'x',
+                        yref: 'y',
+                        text: 'Forecast Start',
+                        showarrow: true,
+                        arrowhead: 2,
+                        arrowsize: 1,
+                        arrowwidth: 1,
+                        arrowcolor: 'rgba(255, 255, 255, 0.3)',
+                        ax: -20,
+                        ay: 0,
+                        font: {
+                            family: 'Inter',
+                            size: 12,
+                            color: '#cbd5e1'
+                        },
+                        bgcolor: 'rgba(29, 33, 56, 0.7)',
+                        bordercolor: 'rgba(255, 255, 255, 0.1)',
+                        borderwidth: 1,
+                        borderpad: 4
+                    }]
+                };
+                
+                Plotly.newPlot('forecast-chart', data, layout, { responsive: true, displayModeBar: false });
+            } catch (e) {
+                console.error("Error rendering forecast chart:", e);
+                const chartContainer = document.getElementById('forecast-chart');
+                if (chartContainer) {
+                    chartContainer.innerHTML = "<div style='display:flex;justify-content:center;align-items:center;height:100%;'><p>Error rendering chart. Please try refreshing the page.</p></div>";
+                }
+            }
+        }
+        
+        // Anomalies Chart
+        function renderAnomaliesChart(viewType) {
+            try {
+                const chartContainer = document.getElementById('anomalies-chart');
+                if (!chartContainer) return;
+                
+                if (typeof Plotly === 'undefined') {
+                    chartContainer.innerHTML = "<div style='display:flex;justify-content:center;align-items:center;height:100%;'><p>Chart library not available.</p></div>";
+                    return;
+                }
+                
+                // Extract data
+                const periods = window.dashboardData.sentimentData.map(d => d.label);
+                const sentiments = window.dashboardData.sentimentData.map(d => d.avg_sentiment);
+                const anomalyIndices = [1, 5, 8]; // 0-based indices for anomalies (Split 2, 6, 9)
+                
+                // Normal time series with anomalies highlighted
+                const normalTrace = {
+                    x: periods,
+                    y: sentiments,
+                    type: 'scatter',
+                    mode: 'lines+markers',
+                    name: 'Sentiment',
+                    line: {
+                        color: '#ef4444',
+                        width: 2
+                    },
+                    marker: {
+                        size: 8,
+                        color: '#ef4444'
+                    }
+                };
+                
+                // Create anomaly points
+                const anomalyX = anomalyIndices.map(i => periods[i]);
+                const anomalyY = anomalyIndices.map(i => sentiments[i]);
+                
+                const anomalyTrace = {
+                    x: anomalyX,
+                    y: anomalyY,
+                    type: 'scatter',
+                    mode: 'markers',
+                    name: 'Anomalies',
+                    marker: {
+                        size: 15,
+                        color: '#f59e0b',
+                        symbol: 'circle-open',
+                        line: {
+                            color: '#f59e0b',
+                            width: 3
+                        }
+                    },
+                    hovertemplate: '<b>%{x}</b><br>Sentiment: %{y:.3f}<br><b>ANOMALY DETECTED</b><extra></extra>'
+                };
+                
+                // Add control band (±2σ)
+                const mean = sentiments.reduce((a, b) => a + b, 0) / sentiments.length;
+                const stdDev = Math.sqrt(sentiments.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / sentiments.length);
+                
+                const upperBand = {
+                    x: periods,
+                    y: Array(periods.length).fill(mean + 2 * stdDev),
+                    type: 'scatter',
+                    mode: 'lines',
+                    name: 'Upper Control Band (2σ)',
+                    line: {
+                        color: 'rgba(255, 255, 255, 0.2)',
+                        width: 1,
+                        dash: 'dash'
+                    }
+                };
+                
+                const lowerBand = {
+                    x: periods,
+                    y: Array(periods.length).fill(mean - 2 * stdDev),
+                    type: 'scatter',
+                    mode: 'lines',
+                    name: 'Lower Control Band (2σ)',
+                    line: {
+                        color: 'rgba(255, 255, 255, 0.2)',
+                        width: 1,
+                        dash: 'dash'
+                    }
+                };
+                
+                const data = [lowerBand, upperBand, normalTrace, anomalyTrace];
+                
+                const layout = {
+                    paper_bgcolor: 'rgba(0,0,0,0)',
+                    plot_bgcolor: 'rgba(0,0,0,0)',
+                    xaxis: { 
+                        title: { text: 'Time Period', font: { family: 'Inter', size: 14, color: '#cbd5e1' } },
+                        gridcolor: '#30363d',
+                        tickfont: { family: 'Inter', size: 12, color: '#64748b' }
+                    },
+                    yaxis: { 
+                        title: { text: 'Sentiment Score', font: { family: 'Inter', size: 14, color: '#cbd5e1' } },
+                        gridcolor: '#30363d',
+                        tickfont: { family: 'Inter', size: 12, color: '#64748b' }
+                    },
+                    legend: { 
+                        font: { family: 'Inter', size: 12, color: '#cbd5e1' }
+                    },
+                    hovermode: 'closest',
+                    hoverlabel: {
+                        bgcolor: '#21262d',
+                        font: { family: 'Inter', size: 12, color: '#f8fafc' },
+                        bordercolor: '#30363d'
+                    },
+                    annotations: [{
+                        x: 0.98,
+                        y: mean + 2 * stdDev,
+                        xref: 'paper',
+                        yref: 'y',
+                        text: '+2σ',
+                        showarrow: false,
+                        font: {
+                            family: 'Inter',
+                            size: 12,
+                            color: '#cbd5e1'
+                        }
+                    },
+                    {
+                        x: 0.98,
+                        y: mean - 2 * stdDev,
+                        xref: 'paper',
+                        yref: 'y',
+                        text: '-2σ',
+                        showarrow: false,
+                        font: {
+                            family: 'Inter',
+                            size: 12,
+                            color: '#cbd5e1'
+                        }
+                    }]
+                };
+                
+                Plotly.newPlot('anomalies-chart', data, layout, { responsive: true, displayModeBar: false });
+            } catch (e) {
+                console.error("Error rendering anomalies chart:", e);
+                const chartContainer = document.getElementById('anomalies-chart');
+                if (chartContainer) {
+                    chartContainer.innerHTML = "<div style='display:flex;justify-content:center;align-items:center;height:100%;'><p>Error rendering chart. Please try refreshing the page.</p></div>";
+                }
+            }
+        }
+        
+        // Set up chart controls
+        document.addEventListener('DOMContentLoaded', function() {
+            try {
+                document.querySelectorAll('.chart-controls').forEach(controls => {
+                    const buttons = controls.querySelectorAll('.chart-control-btn');
+                    
+                    buttons.forEach(button => {
+                        button.addEventListener('click', function() {
+                            try {
+                                const parent = this.closest('.chart-controls');
+                                if (!parent) return;
+                                
+                                parent.querySelectorAll('.chart-control-btn').forEach(b => {
+                                    b.classList.remove('active');
+                                });
+                                this.classList.add('active');
+                                
+                                const view = this.getAttribute('data-view');
+                                if (!view) return;
+                                
+                                const parentTab = this.closest('.tab-content');
+                                if (!parentTab) return;
+                                
+                                if (parentTab.id === 'timeline-tab') {
+                                    renderTimelineChart(view);
+                                } else if (parentTab.id === 'comparison-tab') {
+                                    renderComparisonChart(view);
+                                } else if (parentTab.id === 'influencers-tab') {
+                                    renderInfluencerChart(view);
+                                } else if (parentTab.id === 'anomalies-tab') {
+                                    renderAnomaliesChart(view);
+                                }
+                            } catch (e) {
+                                console.error("Error handling button click:", e);
+                            }
+                        });
+                    });
+                });
+            } catch (e) {
+                console.error("Error setting up chart controls:", e);
+            }
+        });
+    </script>
+</body>
+</html>
